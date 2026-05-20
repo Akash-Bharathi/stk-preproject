@@ -13,8 +13,7 @@ Features
 -Mobile responsive design with 2 cards per row
 
 Project structure:
-movielist/
-├── public/
+movielist/├── public/
 ├── src/
 │   ├── assets/
 │   ├── components/
@@ -22,7 +21,7 @@ movielist/
 │   │   ├── Loader.jsx
 │   │   ├── MovieCard.jsx
 │   │   ├── MovieModel.jsx
-│   │   ├── SearchBar.jsx
+│   │  ├── SearchBar.jsx
 │   ├── services/
 │   │   ├── ombdapi.js
 │   ├── App.jsx
