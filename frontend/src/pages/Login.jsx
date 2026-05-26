@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { login } from "../services/ombdapi";
+import toast from "react-hot-toast";
+import {
+  Link
+} from "react-router-dom";import { login } from "../services/ombdapi";
 
 function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState("test@gmail.com");
@@ -12,11 +15,29 @@ function Login({ onLoginSuccess }) {
     setIsLoading(true);
 
     try {
-      const data = await login({ email, password });
-      localStorage.setItem("token", data.access_token);
-      onLoginSuccess();
+      const data = await login({
+  email,
+  password
+});
+localStorage.setItem(
+  "email",
+  email
+);
+
+onLoginSuccess(
+  data.access_token
+);
+toast.success(
+  "Login successful"
+);
     } catch (loginError) {
-      setError(loginError.message || "Login failed");
+      const message =
+        loginError?.message ||
+        loginError?.detail ||
+        "Login failed";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -61,6 +82,10 @@ function Login({ onLoginSuccess }) {
         {/* <p className="info-note">
           Use <strong>test@gmail.com</strong> and password <strong>12345678</strong>.
         </p> */}
+
+        <p className="login-footer">
+          Don't have an account? <Link to="/register">Register</Link>
+        </p>
       </div>
     </div>
   );

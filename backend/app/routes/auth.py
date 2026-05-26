@@ -1,48 +1,71 @@
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.orm import Session
+
 from app.database.connection import SessionLocal
-from app.models.user import User
-from app.schemas.user_schema import UserRegister, UserLogin
-from app.utils.hashing import hash_password, verify_password
+
+from app.schemas.user_schema import (
+    UserRegister,
+    UserLogin
+)
+
+from app.utils.hashing import (
+    hash_password,
+    verify_password
+)
+
 from app.utils.jwt_handler import create_access_token
+
+from app.database.crud import (
+    get_user_by_email,
+    create_user
+)
 
 router = APIRouter()
 
+
+# Register
 @router.post("/register")
 def register(user: UserRegister):
 
     db: Session = SessionLocal()
 
-    existing_user = db.query(User).filter(
-        User.email == user.email
-    ).first()
+    existing_user = get_user_by_email(
+        db,
+        user.email
+    )
 
     if existing_user:
+
         raise HTTPException(
             status_code=400,
             detail="Email already exists"
         )
 
-    new_user = User(
-        email=user.email,
-        password=hash_password(user.password)
+    create_user(
+        db,
+        user.email,
+        hash_password(user.password)
     )
 
-    db.add(new_user)
-    db.commit()
+    return {
+        "success": True,
+        "message": "User registered successfully"
+    }
 
-    return {"message": "User registered successfully"}
 
+# Login
 @router.post("/login")
 def login(user: UserLogin):
 
     db: Session = SessionLocal()
 
-    existing_user = db.query(User).filter(
-        User.email == user.email
-    ).first()
+    existing_user = get_user_by_email(
+        db,
+        user.email
+    )
 
     if not existing_user:
+
         raise HTTPException(
             status_code=401,
             detail="Invalid credentials"
@@ -52,6 +75,7 @@ def login(user: UserLogin):
         user.password,
         existing_user.password
     ):
+
         raise HTTPException(
             status_code=401,
             detail="Invalid credentials"
@@ -61,4 +85,7 @@ def login(user: UserLogin):
         {"sub": existing_user.email}
     )
 
-    return {"access_token": token}
+    return {
+        "success": True,
+        "access_token": token
+    }

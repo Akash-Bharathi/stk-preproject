@@ -1,5 +1,20 @@
-const Loader = () => {
-  return <h2 className="loader">Loading...</h2>;
-};
+function Loader() {
+
+  return (
+
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "3rem",
+      }}
+    >
+
+      <div className="spinner"></div>
+
+    </div>
+  );
+}
 
 export default Loader;
