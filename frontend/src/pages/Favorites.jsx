@@ -7,6 +7,8 @@ import {
   getFavorites,
   deleteFavorite
 } from "../services/ombdapi";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 
 function Favorites() {
@@ -19,6 +21,9 @@ function Favorites() {
 
   const [error, setError] =
     useState("");
+
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   // LOAD FAVORITES
   const loadFavorites = async () => {
@@ -36,9 +41,17 @@ function Favorites() {
 
     } catch (err) {
 
-      setError(
-        "Failed to load favorites"
-      );
+      console.error("Failed to load favorites:", err);
+      if (err?.message === "Unauthorized") {
+        // log user out and redirect to login
+        try {
+          logout();
+        } catch (e) { }
+        navigate("/login");
+        return;
+      }
+
+      setError(err?.message || "Failed to load favorites");
 
     } finally {
 
@@ -56,7 +69,7 @@ function Favorites() {
           movieId
         );
         toast.success(
-        "Favorite removed"
+          "Favorite removed"
         );
         setFavorites((prev) =>
           prev.filter(
@@ -72,8 +85,8 @@ function Favorites() {
           "Failed to remove favorite"
         );
         toast.error(
-  "Failed to remove favorite"
-);
+          "Failed to remove favorite"
+        );
       }
     };
 
@@ -87,8 +100,8 @@ function Favorites() {
   // LOADING
   if (loading) {
 
-  return <Loader />;
-}
+    return <Loader />;
+  }
 
   // ERROR
   if (error) {
@@ -137,77 +150,24 @@ function Favorites() {
         My Favorites
       </h1>
 
-      <div
-        style={{
-          display: "grid",
-
-          gridTemplateColumns:
-            "repeat(auto-fit, minmax(180px, 1fr))",
-
-          gap: "1.5rem",
-        }}
-      >
-
+      <div className="movie-container">
         {favorites.map((movie) => (
-
-          <div
-            key={movie.movie_id}
-
-            style={{
-              background:
-                "rgba(255,255,255,0.08)",
-
-              padding: "1rem",
-
-              borderRadius: "10px",
-            }}
-          >
-
+          <div key={movie.movie_id} className="movie-card">
             <img
-              src={movie.poster}
+              src={movie.poster || "https://via.placeholder.com/300x450"}
               alt={movie.title}
-
-              style={{
-                width: "100%",
-
-                borderRadius: "8px",
-
-                marginBottom: "1rem",
-              }}
             />
 
-            <h3
-              style={{
-                color: "white",
-              }}
-            >
-              {movie.title}
-            </h3>
-
-            <button
-              onClick={() =>
-                removeFavorite(
-                  movie.movie_id
-                )
-              }
-
-              style={{
-                marginTop: "1rem",
-
-                width: "100%",
-
-                padding: "0.7rem",
-
-                border: "none",
-
-                borderRadius: "6px",
-
-                cursor: "pointer",
-              }}
-            >
-              Remove
-            </button>
-
+            <div className="info">
+              <h3>{movie.title}</h3>
+              <p>{movie.year || ""}</p>
+              <button
+                className="primary-btn danger-btn"
+                onClick={() => removeFavorite(movie.movie_id)}
+              >
+                Remove
+              </button>
+            </div>
           </div>
         ))}
       </div>

@@ -1,4 +1,6 @@
-import { Navigate } from "react-router-dom";
+import {
+  Navigate
+} from "react-router-dom";
 
 import {
   useAuth
@@ -12,13 +14,13 @@ function ProtectedRoute({
     isAuthenticated
   } = useAuth();
 
-  // If not logged in
   if (!isAuthenticated) {
 
-    return <Navigate to="/login" />;
+    return (
+      <Navigate to="/login" />
+    );
   }
 
-  // If logged in
   return children;
 }
 

@@ -1,104 +1,42 @@
 import {
+  useState
+} from "react";
+
+import {
   Link
 } from "react-router-dom";
 
 function Navbar({
   darkMode,
   setDarkMode,
-  handleLogout
+  logout,
+  userName
 }) {
-const email =
-  localStorage.getItem("email");
 
-const username =
-  email
-    ? email.split("@")[0]
-    : "User";
+  const [menuOpen, setMenuOpen] =
+    useState(false);
 
   return (
 
-    <div className="top-bar">
+    <nav className="navbar">
 
       {/* LOGO */}
-      <h1
-        style={{
-          color: "white",
-          fontFamily:
-            "Arial, sans-serif",
-        }}
-      >
+      <h1 className="logo">
         MOVIE APP
       </h1>
 
-      {/* NAVIGATION */}
-      <div
-        style={{
-          display: "flex",
-          gap: "1rem",
-          alignItems: "center",
-        }}
-        
-      >
-        <div
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "0.7rem",
-    marginRight: "1rem",
-  }}
->
+      {/* DESKTOP MENU */}
+      <div className="nav-links desktop-menu">
 
-  {/* PROFILE IMAGE */}
-  <img
-    src="https://i.pravatar.cc/40"
-    alt="profile"
-
-    style={{
-      width: "40px",
-      height: "40px",
-      borderRadius: "50%",
-      objectFit: "cover",
-    }}
-  />
-
-  {/* USERNAME */}
-  <p
-    style={{
-      color: "white",
-      margin: 0,
-      fontWeight: "bold",
-    }}
-  >
-    Hello, {username}
-  </p>
-
-</div>  
-
-        {/* HOME */}
-        <Link
-          to="/"
-          style={{
-            color: "white",
-            textDecoration: "none",
-          }}
-        >
+        <Link to="/">
           Home
         </Link>
 
-        {/* FAVORITES */}
-        <Link
-          to="/favorites"
-          style={{
-            color: "white",
-            textDecoration: "none",
-          }}
-        >
+        <Link to="/favorites">
           Favorites
         </Link>
 
-        {/* THEME BUTTON */}
         <button
-          className="theme-btn"
           onClick={() =>
             setDarkMode(
               !darkMode
@@ -110,17 +48,91 @@ const username =
             : "Dark Mode"}
         </button>
 
-        {/* LOGOUT */}
         <button
-          className="theme-btn"
-          onClick={handleLogout}
+          onClick={logout}
         >
           Logout
         </button>
 
+        {/* USER */}
+        <div className="user-box">
+
+          <div className="avatar">
+            {userName?.charAt(0)}
+          </div>
+
+          <span>
+            Hello, {userName}
+          </span>
+
+        </div>
+
       </div>
 
-    </div>
+      {/* MOBILE MENU BUTTON */}
+      <button
+
+        className="menu-btn"
+
+        onClick={() =>
+          setMenuOpen(
+            !menuOpen
+          )
+        }
+      >
+        ☰
+      </button>
+
+      {/* MOBILE DROPDOWN */}
+      {menuOpen && (
+
+        <div className="mobile-menu">
+
+          <Link
+            to="/"
+            onClick={() =>
+              setMenuOpen(false)
+            }
+          >
+            Home
+          </Link>
+
+          <Link
+            to="/favorites"
+            onClick={() =>
+              setMenuOpen(false)
+            }
+          >
+            Favorites
+          </Link>
+
+          <button
+            onClick={() => {
+              setDarkMode(
+                !darkMode
+              );
+
+              setMenuOpen(false);
+            }}
+          >
+            {darkMode
+              ? "Light Mode"
+              : "Dark Mode"}
+          </button>
+
+          <button
+            onClick={() => {
+              logout();
+
+              setMenuOpen(false);
+            }}
+          >
+            Logout
+          </button>
+
+        </div>
+      )}
+    </nav>
   );
 }
 

@@ -17,14 +17,12 @@ const getErrorMessage = (data, fallback) => {
 // ---------------- TOKEN ----------------
 
 const getAuthHeaders = () => {
-
-  const token =
-    localStorage.getItem("token");
-
-  return {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
-  };
+  const token = localStorage.getItem("token");
+  const headers = { "Content-Type": "application/json" };
+  if (token && token !== "null" && token !== "undefined") {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
 };
 
 
@@ -106,11 +104,20 @@ export const searchMovies = async (
   title
 ) => {
 
-  const response = await fetch(
-    `${BASE_URL}/movies/search?title=${title}`
-  );
+  try {
+    const response = await fetch(
+      `${BASE_URL}/movies/search?title=${title}`
+    );
 
-  return response.json();
+    const text = await response.text();
+    try {
+      return text ? JSON.parse(text) : null;
+    } catch (e) {
+      return text;
+    }
+  } catch (e) {
+    throw new Error(`Network error: Unable to reach ${BASE_URL}`);
+  }
 };
 
 
@@ -118,12 +125,20 @@ export const searchMovies = async (
 
 export const getMovieDetails =
   async (imdbID) => {
+    try {
+      const response = await fetch(
+        `${BASE_URL}/movies/${imdbID}`
+      );
 
-    const response = await fetch(
-      `${BASE_URL}/movies/${imdbID}`
-    );
-
-    return response.json();
+      const text = await response.text();
+      try {
+        return text ? JSON.parse(text) : null;
+      } catch (e) {
+        return text;
+      }
+    } catch (e) {
+      throw new Error(`Network error: Unable to reach ${BASE_URL}`);
+    }
   };
 
 
@@ -159,14 +174,17 @@ export const addFavorite =
       );
     }
 
-    const data =
-      await response.json();
+    const text = await response.text();
+    let data;
+    try {
+      data = text ? JSON.parse(text) : null;
+    } catch (e) {
+      data = text;
+    }
 
     if (!response.ok) {
-
       throw new Error(
-        data.detail ||
-        "Failed to add favorite"
+        getErrorMessage(data, "Failed to add favorite")
       );
     }
 
@@ -185,7 +203,9 @@ export const getFavorites =
         headers:
           getAuthHeaders(),
       }
-    );
+    ).catch(() => {
+      throw new Error(`Network error: Unable to reach ${BASE_URL}`);
+    });
 
     if (response.status === 401) {
 
@@ -198,12 +218,24 @@ export const getFavorites =
       );
     }
 
-    const data =
-      await response.json();
+    const text = await response.text();
 
-    return Array.isArray(data)
-      ? data
-      : [];
+    if (!text) return [];
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      return [];
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        getErrorMessage(data, "Failed to fetch favorites")
+      );
+    }
+
+    return Array.isArray(data) ? data : [];
   };
 
 
@@ -220,7 +252,9 @@ export const deleteFavorite =
         headers:
           getAuthHeaders(),
       }
-    );
+    ).catch(() => {
+      throw new Error(`Network error: Unable to reach ${BASE_URL}`);
+    });
 
     if (response.status === 401) {
 
@@ -233,14 +267,17 @@ export const deleteFavorite =
       );
     }
 
-    const data =
-      await response.json();
+    const text = await response.text();
+    let data;
+    try {
+      data = text ? JSON.parse(text) : null;
+    } catch (e) {
+      data = text;
+    }
 
     if (!response.ok) {
-
       throw new Error(
-        data.detail ||
-        "Failed to delete favorite"
+        getErrorMessage(data, "Failed to delete favorite")
       );
     }
 

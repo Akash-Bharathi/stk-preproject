@@ -26,66 +26,65 @@ router = APIRouter()
 # Register
 @router.post("/register")
 def register(user: UserRegister):
-
     db: Session = SessionLocal()
-
-    existing_user = get_user_by_email(
-        db,
-        user.email
-    )
-
-    if existing_user:
-
-        raise HTTPException(
-            status_code=400,
-            detail="Email already exists"
+    try:
+        existing_user = get_user_by_email(
+            db,
+            user.email
         )
 
-    create_user(
-        db,
-        user.email,
-        hash_password(user.password)
-    )
+        if existing_user:
+            raise HTTPException(
+                status_code=400,
+                detail="Email already exists"
+            )
 
-    return {
-        "success": True,
-        "message": "User registered successfully"
-    }
+        create_user(
+            db,
+            user.email,
+            hash_password(user.password)
+        )
+
+        return {
+            "success": True,
+            "message": "User registered successfully"
+        }
+    finally:
+        db.close()
 
 
 # Login
 @router.post("/login")
 def login(user: UserLogin):
-
     db: Session = SessionLocal()
-
-    existing_user = get_user_by_email(
-        db,
-        user.email
-    )
-
-    if not existing_user:
-
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid credentials"
+    try:
+        existing_user = get_user_by_email(
+            db,
+            user.email
         )
 
-    if not verify_password(
-        user.password,
-        existing_user.password
-    ):
+        if not existing_user:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid credentials"
+            )
 
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid credentials"
+        if not verify_password(
+            user.password,
+            existing_user.password
+        ):
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid credentials"
+            )
+
+        token = create_access_token(
+            {"sub": existing_user.email}
         )
 
-    token = create_access_token(
-        {"sub": existing_user.email}
-    )
-
-    return {
-        "success": True,
-        "access_token": token
-    }
+        return {
+            "success": True,
+            "access_token": token
+        }
+    finally:
+        db.close()

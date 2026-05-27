@@ -16,10 +16,10 @@ ReactDOM.createRoot(
   <React.StrictMode>
 
     <AuthProvider>
-  <Toaster
-    position="top-right"
-    reverseOrder={false}
-  />
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+      />
       <App />
 
     </AuthProvider>

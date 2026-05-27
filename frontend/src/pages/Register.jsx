@@ -19,6 +19,12 @@ function Register() {
   const [password, setPassword] =
     useState("");
 
+  const [emailError, setEmailError] =
+    useState("");
+
+  const [passwordError, setPasswordError] =
+    useState("");
+
   const [error, setError] =
     useState("");
 
@@ -28,6 +34,29 @@ function Register() {
   const [isLoading, setIsLoading] =
     useState(false);
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const passwordRegex = /^.{6,}$/;
+
+  const validateEmail = (value) => {
+    if (!value.trim()) {
+      return "Email is required";
+    }
+    if (!emailRegex.test(value)) {
+      return "Enter a valid email address";
+    }
+    return "";
+  };
+
+  const validatePassword = (value) => {
+    if (!value.trim()) {
+      return "Password is required";
+    }
+    if (!passwordRegex.test(value)) {
+      return "Password must be at least 6 characters";
+    }
+    return "";
+  };
+
   // REGISTER
   const handleRegister = async () => {
 
@@ -35,12 +64,18 @@ function Register() {
 
     setSuccess("");
 
-    if (!email || !password) {
+    const emailValidation = validateEmail(email);
+    const passwordValidation = validatePassword(password);
+    setEmailError(emailValidation);
+    setPasswordError(passwordValidation);
 
-      setError(
-        "Please fill all fields"
-      );
-
+    if (emailValidation || passwordValidation) {
+      if (emailValidation) {
+        toast.error(emailValidation);
+      }
+      if (passwordValidation) {
+        toast.error(passwordValidation);
+      }
       return;
     }
 
@@ -57,8 +92,8 @@ function Register() {
         "Registration successful"
       );
       toast.success(
-  "Registration successful"
-);
+        "Registration successful"
+      );
 
       // Redirect to login after 1 second
       setTimeout(() => {
@@ -69,18 +104,18 @@ function Register() {
 
     } catch (registerError) {
 
-  const message =
-    registerError.message ||
-    "Registration failed";
+      const message =
+        registerError.message ||
+        "Registration failed";
 
-  setError(message);
+      setError(message);
 
-  toast.error(message);
+      toast.error(message);
 
-} finally {
+    } finally {
 
-  setIsLoading(false);
-}
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -110,10 +145,15 @@ function Register() {
             type="email"
             placeholder="Enter email"
             value={email}
-            onChange={(e) =>
-              setEmail(e.target.value)
-            }
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (emailError) {
+                setEmailError(validateEmail(e.target.value));
+              }
+            }}
+            onBlur={() => setEmailError(validateEmail(email))}
           />
+          {emailError && <p className="error-msg">{emailError}</p>}
 
         </div>
 
@@ -126,10 +166,15 @@ function Register() {
             type="password"
             placeholder="Enter password"
             value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (passwordError) {
+                setPasswordError(validatePassword(e.target.value));
+              }
+            }}
+            onBlur={() => setPasswordError(validatePassword(password))}
           />
+          {passwordError && <p className="error-msg">{passwordError}</p>}
 
         </div>
 

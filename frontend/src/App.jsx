@@ -2,7 +2,6 @@ import {
   useEffect,
   useState
 } from "react";
-
 import {
   BrowserRouter,
   Routes,
@@ -10,6 +9,7 @@ import {
   Navigate
 } from "react-router-dom";
 import MovieCard from "./components/MovieCard";
+import MovieSkeleton from "./components/MovieSkeleton";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { addFavorite, getFavorites, deleteFavorite } from "./services/ombdapi";
@@ -28,15 +28,15 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [wishlist, setWishlist] = useState([]);
   const [favorites, setFavorites] = useState([]);
-  
+
   const [darkMode, setDarkMode] = useState(false);
   const [loading, setLoading] =
-  useState(false);
+    useState(false);
   const {
-  isAuthenticated,
-  login,
-  logout
-} = useAuth();
+    isAuthenticated,
+    login,
+    logout
+  } = useAuth();
   const [error, setError] = useState("");
 
   const randomMovies = [
@@ -52,53 +52,53 @@ function App() {
     "Harry Potter",
   ];
 
-// 
-const fetchMovies = async (
-  title
-) => {
+  // 
+  const fetchMovies = async (
+    title
+  ) => {
 
-  try {
+    try {
 
-    setLoading(true);
+      setLoading(true);
 
-    const response =
-      await fetch(
-        `http://127.0.0.1:8000/movies/search?title=${title}`
+      const response =
+        await fetch(
+          `http://127.0.0.1:8000/movies/search?title=${title}`
+        );
+
+      const data =
+        await response.json();
+
+      if (data.Search) {
+
+        setMovies(
+          data.Search.slice(0, 10)
+        );
+
+      } else {
+
+        setMovies([]);
+      }
+
+    } catch (error) {
+
+      console.error(
+        "Error fetching movies:",
+        error
       );
-
-    const data =
-      await response.json();
-
-    if (data.Search) {
-
-      setMovies(
-        data.Search.slice(0, 10)
-      );
-
-    } else {
 
       setMovies([]);
+
+    } finally {
+
+      setLoading(false);
     }
-
-  } catch (error) {
-
-    console.error(
-      "Error fetching movies:",
-      error
-    );
-
-    setMovies([]);
-
-  } finally {
-
-    setLoading(false);
-  }
-};
+  };
 
   // Homepage random movies
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
+    if (token && token !== "null" && token !== "undefined") {
       login(token);
       loadFavorites();
     }
@@ -112,33 +112,33 @@ const fetchMovies = async (
 
   const loadFavorites = async () => {
 
-  try {
+    try {
 
-    setError("");
+      setError("");
 
-    const data = await getFavorites();
+      const data = await getFavorites();
 
-    setFavorites(
-      Array.isArray(data) ? data : []
-    );
+      setFavorites(
+        Array.isArray(data) ? data : []
+      );
 
-  } catch (error) {
+    } catch (error) {
 
-    if (error.message === "Unauthorized") {
+      if (error.message === "Unauthorized") {
 
-      handleLogout();
+        handleLogout();
+      }
+
+      if (error.message === "Unauthorized") {
+        // already handled logout above; don't show an error message
+        return;
+      }
+
+      console.error("Failed to load favorites:", error);
+      setFavorites([]);
+      setError(error?.message || "Failed to load favorites");
     }
-
-    console.error(
-      "Failed to load favorites:",
-      error
-    );
-
-    setFavorites([]);
-
-    setError("Failed to load favorites");
-  }
-};
+  };
 
   const removeFavorite = async (movie) => {
     const movieId = movie.movie_id ?? movie.imdbID ?? movie.movie_id;
@@ -165,19 +165,19 @@ const fetchMovies = async (
 
   const handleLoginSuccess = (token) => {
 
-  login(token);
+    login(token);
 
-  loadFavorites();
-};
+    loadFavorites();
+  };
 
   const handleLogout = () => {
 
-  logout();
+    logout();
 
-  setFavorites([]);
+    setFavorites([]);
 
-  setWishlist([]);
-};
+    setWishlist([]);
+  };
 
   // Search movies
   const handleSearch = () => {
@@ -190,98 +190,98 @@ const fetchMovies = async (
       fetchMovies(searchTerm);
     }
   };
-useEffect(() => {
+  useEffect(() => {
 
-  const delaySearch =
-    setTimeout(() => {
+    const delaySearch =
+      setTimeout(() => {
 
-      if (
-        searchTerm.trim() === ""
-      ) {
+        if (
+          searchTerm.trim() === ""
+        ) {
 
-        const random =
-          randomMovies[
+          const random =
+            randomMovies[
             Math.floor(
               Math.random() *
               randomMovies.length
             )
-          ];
+            ];
 
-        fetchMovies(random);
+          fetchMovies(random);
 
-      } else {
+        } else {
 
-        fetchMovies(searchTerm);
-      }
+          fetchMovies(searchTerm);
+        }
 
-    }, 500);
+      }, 500);
 
-  return () =>
-    clearTimeout(delaySearch);
+    return () =>
+      clearTimeout(delaySearch);
 
-}, [searchTerm]);
+  }, [searchTerm]);
 
   // Add wishlist
   const addToWishlist = async (movie) => {
 
-  const exists = wishlist.find(
-    (item) => item.imdbID === movie.imdbID
-  );
-
-  if (exists) {
-    return;
-  }
-
-  try {
-
-    setError("");
-
-    await addFavorite(movie);
-
-    setWishlist([
-      ...wishlist,
-      movie
-    ]);
-
-    await loadFavorites();
-
-  } catch (error) {
-
-    if (error.message === "Unauthorized") {
-
-      handleLogout();
-    }
-
-    console.error(
-      "Failed to add favorite:",
-      error
+    const exists = wishlist.find(
+      (item) => item.imdbID === movie.imdbID
     );
 
-    setError("Failed to add favorite");
-  }
-};
+    if (exists) {
+      return;
+    }
 
-  
+    try {
+
+      setError("");
+
+      await addFavorite(movie);
+
+      setWishlist([
+        ...wishlist,
+        movie
+      ]);
+
+      await loadFavorites();
+
+    } catch (error) {
+
+      if (error.message === "Unauthorized") {
+
+        handleLogout();
+      }
+
+      console.error(
+        "Failed to add favorite:",
+        error
+      );
+
+      setError("Failed to add favorite");
+    }
+  };
+
+
 
   return (
 
-  <BrowserRouter>
+    <BrowserRouter>
 
-    <Routes>
+      <Routes>
 
-      <Route
-        path="/login"
-        element={
-          isAuthenticated ? (
-            <Navigate to="/" />
-          ) : (
-            <Login
-              onLoginSuccess={handleLoginSuccess}
-            />
-          )
-        }
-      />
-      <Route
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/" />
+            ) : (
+              <Login
+                onLoginSuccess={handleLoginSuccess}
+              />
+            )
+          }
+        />
+        <Route
           path="/register"
           element={
             isAuthenticated ? (
@@ -292,88 +292,106 @@ useEffect(() => {
           }
         />
 
-      <Route
-        path="/"
-        element={
+        <Route
+          path="/"
+          element={
 
-          <ProtectedRoute>
+            <ProtectedRoute>
 
-            <div className={darkMode ? "app dark" : "app light"}>
-            <NavBar
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}
-        handleLogout={handleLogout}
-      />
+              <div className={darkMode ? "app dark" : "app light"}>
+                <NavBar
+                  darkMode={darkMode}
+                  setDarkMode={setDarkMode}
+                  handleLogout={handleLogout}
+                />
 
-      <div className="search-container">
-        <input
-          type="text"
-          placeholder="Search Movies..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+                <div className="search-container">
+                  <input
+                    type="text"
+                    placeholder="Search Movies..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+
+                  <button onClick={handleSearch}>Search</button>
+                </div>
+
+
+                {loading && (
+                  <h2
+                    style={{
+                      color: "white",
+                      textAlign: "center"
+                    }}
+                  >
+                    Loading movies...
+                  </h2>
+                )}
+
+                {error && (
+                  <h2
+                    style={{
+                      color: "red",
+                      textAlign: "center"
+                    }}
+                  >
+                    {error}
+                  </h2>
+                )}
+
+                <div className="movie-container">
+
+                  {loading ? (
+
+                    Array.from({ length: 10 }).map(
+                      (_, index) => (
+
+                        <MovieSkeleton
+                          key={index}
+                        />
+                      )
+                    )
+
+                  ) : (
+
+                    movies.map((movie) => (
+
+                      <MovieCard
+                        key={movie.imdbID}
+                        movie={movie}
+                        addToWishlist={addToWishlist}
+                        wishlist={wishlist}
+                      />
+                    ))
+
+                  )}
+
+                </div>
+              </div>
+
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/favorites"
+          element={
+            <ProtectedRoute>
+              <div className={darkMode ? "app dark" : "app light"}>
+                <NavBar
+                  darkMode={darkMode}
+                  setDarkMode={setDarkMode}
+                  handleLogout={handleLogout}
+                />
+                <Favorites />
+              </div>
+            </ProtectedRoute>
+          }
         />
 
-        <button onClick={handleSearch}>Search</button>
-      </div>
+      </Routes>
 
-     
-      {loading && (
-  <h2
-    style={{
-      color: "white",
-      textAlign: "center"
-    }}
-  >
-    Loading movies...
-  </h2>
-)}
-
-{error && (
-  <h2
-    style={{
-      color: "red",
-      textAlign: "center"
-    }}
-  >
-    {error}
-  </h2>
-)}
-
-      <div className="movie-container">
-        {movies.map((movie) => (
-          <MovieCard
-            key={movie.imdbID}
-            movie={movie}
-            addToWishlist={addToWishlist}
-            wishlist={wishlist}
-          />
-        ))}
-      </div>
-    </div>
-
-  </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/favorites"
-        element={
-          <ProtectedRoute>
-            <div className={darkMode ? "app dark" : "app light"}>
-              <NavBar
-                darkMode={darkMode}
-                setDarkMode={setDarkMode}
-                handleLogout={handleLogout}
-              />
-              <Favorites />
-            </div>
-          </ProtectedRoute>
-        }
-      />
-
-    </Routes>
-
-  </BrowserRouter>
-);
+    </BrowserRouter>
+  );
 }
 
 export default App;
