@@ -1,12 +1,13 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
+from datetime import datetime
 
 from app.database.connection import Base
 
 
-class Favorite(Base):
+class SearchHistory(Base):
 
-    __tablename__ = "favorites"
+    __tablename__ = "search_history"
 
     id = Column(
         Integer,
@@ -14,19 +15,14 @@ class Favorite(Base):
         index=True
     )
 
-    movie_id = Column(
+    keyword = Column(
         String,
         nullable=False
     )
 
-    title = Column(
-        String,
-        nullable=False
-    )
-
-    poster = Column(
-        String,
-        nullable=False
+    searched_at = Column(
+        DateTime,
+        default=datetime.utcnow
     )
 
     user_id = Column(
@@ -36,5 +32,5 @@ class Favorite(Base):
 
     user = relationship(
         "User",
-        back_populates="favorites"
+        back_populates="search_history"
     )

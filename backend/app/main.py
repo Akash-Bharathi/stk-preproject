@@ -6,6 +6,10 @@ from app.models.user import User
 from app.models.favorite import Favorite
 from app.utils.hashing import hash_password
 from sqlalchemy.orm import Session
+from app.models.review import Review
+from app.models.search_history import SearchHistory
+from app.routes.reviews import router as review_router
+from app.routes.history import router as history_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -30,6 +34,8 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(movies.router)
 app.include_router(favorites.router)
+app.include_router(review_router)
+app.include_router(history_router)
 
 
 @app.get("/")

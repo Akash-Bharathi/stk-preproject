@@ -4,9 +4,9 @@ from sqlalchemy.orm import relationship
 from app.database.connection import Base
 
 
-class Favorite(Base):
+class Review(Base):
 
-    __tablename__ = "favorites"
+    __tablename__ = "reviews"
 
     id = Column(
         Integer,
@@ -19,13 +19,13 @@ class Favorite(Base):
         nullable=False
     )
 
-    title = Column(
+    review = Column(
         String,
         nullable=False
     )
 
-    poster = Column(
-        String,
+    rating = Column(
+        Integer,
         nullable=False
     )
 
@@ -36,5 +36,5 @@ class Favorite(Base):
 
     user = relationship(
         "User",
-        back_populates="favorites"
+        back_populates="reviews"
     )

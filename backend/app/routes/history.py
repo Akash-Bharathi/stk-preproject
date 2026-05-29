@@ -1,15 +1,15 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from typing import List
 
 from app.database.connection import SessionLocal
 
-from app.services.omdb_service import (
-    search_movies,
-    get_movie
+from app.schemas.history_schema import (
+    HistoryResponse
 )
 
 from app.services.history_service import (
-    save_search_history
+    get_user_history
 )
 
 from app.utils.auth_dependency import (
@@ -34,26 +34,17 @@ def get_db():
         db.close()
 
 
-# SEARCH MOVIES
-@router.get("/movies/search")
-def search(
-    title: str,
+# GET USER SEARCH HISTORY
+@router.get(
+    "/history",
+    response_model=List[HistoryResponse]
+)
+def history(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
 
-    # SAVE SEARCH HISTORY
-    save_search_history(
+    return get_user_history(
         db,
-        title,
         current_user
     )
-
-    return search_movies(title)
-
-
-# MOVIE DETAILS
-@router.get("/movies/{imdb_id}")
-def movie_details(imdb_id: str):
-
-    return get_movie(imdb_id)
