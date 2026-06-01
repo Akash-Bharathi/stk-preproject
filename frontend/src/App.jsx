@@ -14,6 +14,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { addFavorite, getFavorites, deleteFavorite } from "./services/ombdapi";
 import Favorites from "./pages/Favorites";
+import MovieDetails from "./pages/MovieDetails";
 import NavBar from "./components/NavBar";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -53,30 +54,32 @@ function App() {
   ];
 
   // 
-  const fetchMovies = async (
-    title
-  ) => {
+  const fetchMovies = async (title) => {
 
     try {
 
       setLoading(true);
 
-      const response =
-        await fetch(
-          `http://127.0.0.1:8000/movies/search?title=${title}`
-        );
+      const token = localStorage.getItem("token");
 
-      const data =
-        await response.json();
+      const response = await fetch(
+        `http://127.0.0.1:8000/movies/search?title=${encodeURIComponent(title)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch movies");
+      }
+
+      const data = await response.json();
 
       if (data.Search) {
-
-        setMovies(
-          data.Search.slice(0, 10)
-        );
-
+        setMovies(data.Search.slice(0, 10));
       } else {
-
         setMovies([]);
       }
 
@@ -261,8 +264,6 @@ function App() {
     }
   };
 
-
-
   return (
 
     <BrowserRouter>
@@ -387,8 +388,25 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/movie/:imdbID"
+          element={
+            <ProtectedRoute>
+              <div className={darkMode ? "app dark" : "app light"}>
+                <NavBar
+                  darkMode={darkMode}
+                  setDarkMode={setDarkMode}
+                  handleLogout={handleLogout}
+                />
+
+                <MovieDetails />
+              </div>
+            </ProtectedRoute>
+          }
+        />
 
       </Routes>
+
 
     </BrowserRouter>
   );

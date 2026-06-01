@@ -100,24 +100,23 @@ export const register = async ({
 
 // ---------------- SEARCH MOVIES ----------------
 
-export const searchMovies = async (
-  title
-) => {
+export const searchMovies = async (title) => {
+  const token = localStorage.getItem("token");
 
-  try {
-    const response = await fetch(
-      `${BASE_URL}/movies/search?title=${title}`
-    );
-
-    const text = await response.text();
-    try {
-      return text ? JSON.parse(text) : null;
-    } catch (e) {
-      return text;
+  const response = await fetch(
+    `${BASE_URL}/movies/search?title=${encodeURIComponent(title)}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
-  } catch (e) {
-    throw new Error(`Network error: Unable to reach ${BASE_URL}`);
+  );
+
+  if (response.status === 401 || response.status === 403) {
+    throw new Error("Please login again");
   }
+
+  return response.json();
 };
 
 

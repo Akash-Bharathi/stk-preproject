@@ -1,9 +1,10 @@
+import { useNavigate } from "react-router-dom";
 function MovieCard({
   movie,
   addToWishlist,
   wishlist
 }) {
-
+  const navigate = useNavigate();
   const isAdded =
     wishlist.some(
       (item) =>
@@ -22,14 +23,25 @@ function MovieCard({
             ? movie.Poster
             : "https://via.placeholder.com/300x450"
         }
-
         alt={movie.Title}
+        onClick={() => navigate(`/movie/${movie.imdbID}`)}
+        style={{ cursor: "pointer" }}
       />
 
       <div className="info">
-        <h3>{movie.Title}</h3>
+        <h3
+          onClick={() => navigate(`/movie/${movie.imdbID}`)}
+          style={{ cursor: "pointer" }}
+        >
+          {movie.Title}
+        </h3>
         <p>{movie.Year}</p>
-
+        <button
+          className="primary-btn"
+          onClick={() => navigate(`/movie/${movie.imdbID}`)}
+        >
+          View Details
+        </button>
         <button
           className={isAdded ? "primary-btn success-btn" : "primary-btn"}
           onClick={() => addToWishlist(movie)}
