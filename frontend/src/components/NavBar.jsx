@@ -1,16 +1,13 @@
-import {
-  useState
-} from "react";
+import { useState } from "react";
 
-import {
-  Link
-} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Navbar({
   darkMode,
   setDarkMode,
   logout,
-  userName
+  userName,
+  favoriteCount
 }) {
 
   const [menuOpen, setMenuOpen] =
@@ -33,7 +30,7 @@ function Navbar({
         </Link>
 
         <Link to="/favorites">
-          Favorites
+          Favorites ({favoriteCount})
         </Link>
 
         <button
@@ -103,7 +100,7 @@ function Navbar({
               setMenuOpen(false)
             }
           >
-            Favorites
+            Favorites ({favoriteCount})
           </Link>
 
           <button

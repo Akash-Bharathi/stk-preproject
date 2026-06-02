@@ -10,6 +10,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
+import { Link } from "react-router-dom";
 
 function Favorites() {
 
@@ -122,14 +123,40 @@ function Favorites() {
   if (favorites.length === 0) {
 
     return (
-      <h2
+
+      <div
         style={{
-          color: "white",
+          minHeight: "60vh",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
           textAlign: "center",
+          padding: "2rem",
         }}
       >
-        No favorites added yet
-      </h2>
+
+        <h1
+          style={{
+            color: "white",
+            marginBottom: "1rem",
+          }}
+        >
+          🍿 No Favorites Yet
+        </h1>
+
+        <p
+          style={{
+            color: "#bbb",
+            maxWidth: "500px",
+            lineHeight: "1.6",
+          }}
+        >
+          Search for movies and add them to your favorites list.
+          Your saved movies will appear here.
+        </p>
+
+      </div>
     );
   }
 
@@ -161,12 +188,29 @@ function Favorites() {
             <div className="info">
               <h3>{movie.title}</h3>
               <p>{movie.year || ""}</p>
-              <button
-                className="primary-btn danger-btn"
-                onClick={() => removeFavorite(movie.movie_id)}
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  marginTop: "10px",
+                }}
               >
-                Remove
-              </button>
+
+                <Link
+                  to={`/movie/${movie.movie_id}`}
+                  className="primary-btn danger-btn"
+                >
+                  Details
+                </Link>
+
+                <button
+                  className="primary-btn danger-btn"
+                  onClick={() => removeFavorite(movie.movie_id)}
+                >
+                  Remove
+                </button>
+
+              </div>
             </div>
           </div>
         ))}

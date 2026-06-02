@@ -36,6 +36,9 @@ def get_user_history(
         User.email == current_user["sub"]
     ).first()
 
+    print("USER FOUND:", user)
+    print("EMAIL:", current_user["sub"])
+
     history = db.query(SearchHistory).filter(
         SearchHistory.user_id == user.id
     ).order_by(

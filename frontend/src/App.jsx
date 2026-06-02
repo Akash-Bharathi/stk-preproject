@@ -165,7 +165,21 @@ function App() {
       setError("Failed to remove favorite");
     }
   };
+  const toggleFavorite = async (movie) => {
 
+    const isFavorite = favorites.some(
+      (fav) => fav.movie_id === movie.imdbID
+    );
+
+    if (isFavorite) {
+
+      await removeFavorite(movie);
+
+    } else {
+
+      await addToWishlist(movie);
+    }
+  };
   const handleLoginSuccess = (token) => {
 
     login(token);
@@ -303,7 +317,11 @@ function App() {
                 <NavBar
                   darkMode={darkMode}
                   setDarkMode={setDarkMode}
-                  handleLogout={handleLogout}
+                  logout={handleLogout}
+                  userName={localStorage
+                    .getItem("email")
+                    ?.split("@")[0]}
+                  favoriteCount={favorites.length}
                 />
 
                 <div className="search-container">
@@ -360,8 +378,8 @@ function App() {
                       <MovieCard
                         key={movie.imdbID}
                         movie={movie}
-                        addToWishlist={addToWishlist}
-                        wishlist={wishlist}
+                        toggleFavorite={toggleFavorite}
+                        favorites={favorites}
                       />
                     ))
 
@@ -381,7 +399,11 @@ function App() {
                 <NavBar
                   darkMode={darkMode}
                   setDarkMode={setDarkMode}
-                  handleLogout={handleLogout}
+                  logout={handleLogout}
+                  userName={localStorage
+                    .getItem("email")
+                    ?.split("@")[0]}
+                  favoriteCount={favorites.length}
                 />
                 <Favorites />
               </div>
@@ -396,7 +418,11 @@ function App() {
                 <NavBar
                   darkMode={darkMode}
                   setDarkMode={setDarkMode}
-                  handleLogout={handleLogout}
+                  logout={handleLogout}
+                  userName={localStorage
+                    .getItem("email")
+                    ?.split("@")[0]}
+                  favoriteCount={favorites.length}
                 />
 
                 <MovieDetails />

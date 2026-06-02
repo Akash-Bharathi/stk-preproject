@@ -1,14 +1,14 @@
 import { useNavigate } from "react-router-dom";
 function MovieCard({
   movie,
-  addToWishlist,
-  wishlist
+  toggleFavorite,
+  favorites
 }) {
   const navigate = useNavigate();
   const isAdded =
-    wishlist.some(
+    favorites.some(
       (item) =>
-        item.imdbID ===
+        item.movie_id ===
         movie.imdbID
     );
 
@@ -16,6 +16,12 @@ function MovieCard({
 
     <div className="movie-card">
 
+      <button
+        className="favorite-heart"
+        onClick={() => toggleFavorite(movie)}
+      >
+        {isAdded ? "❤️" : "♡"}
+      </button>
       {/* MOVIE POSTER */}
       <img
         src={
@@ -42,13 +48,13 @@ function MovieCard({
         >
           View Details
         </button>
-        <button
-          className={isAdded ? "primary-btn success-btn" : "primary-btn"}
+        {/* Add to Wishlist Button */}
+        {/* <button
+          className="favorite-heart"
           onClick={() => addToWishlist(movie)}
-          disabled={isAdded}
         >
-          {isAdded ? "Added to Wishlist ✓" : "Add to Wishlist"}
-        </button>
+          {isAdded ? "❤️" : "🤍"}
+        </button> */}
       </div>
 
     </div>

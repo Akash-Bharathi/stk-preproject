@@ -292,6 +292,52 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.movie-card {
+  position: relative;
+}
+.movie-card img {
+  transition: transform 0.3s ease;
+}
+.movie-card:hover img {
+  transform: scale(1.03);
+}
+
+.favorite-heart {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: rgba(248, 248, 248, 0.7);
+  backdrop-filter: blur(4px);
+
+  font-size: 1.4rem;
+  line-height: 1;
+
+  cursor: pointer;
+
+  z-index: 10;
+
+  transition: all 0.2s ease;
+}
+
+.favorite-heart:hover {
+  transform: scale(1.15);
+  background: rgba(120, 116, 116, 0.9);
+}
+.favorite-heart:active {
+  transform: scale(0.9);
+}
+
 .movie-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 26px 60px rgba(0, 0, 0, 0.22);
