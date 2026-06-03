@@ -36,6 +36,9 @@ def get_user_history(
         User.email == current_user["sub"]
     ).first()
 
+    if not user:
+        return []
+
     print("USER FOUND:", user)
     print("EMAIL:", current_user["sub"])
 
@@ -43,6 +46,6 @@ def get_user_history(
         SearchHistory.user_id == user.id
     ).order_by(
         SearchHistory.searched_at.desc()
-    ).all()
+    ).limit(10).all()
 
     return history

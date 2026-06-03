@@ -10,6 +10,7 @@ from app.models.review import Review
 from app.models.search_history import SearchHistory
 from app.routes.reviews import router as review_router
 from app.routes.history import router as history_router
+from app.routes.dashboard import router as dashboard_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -36,6 +37,7 @@ app.include_router(movies.router)
 app.include_router(favorites.router)
 app.include_router(review_router)
 app.include_router(history_router)
+app.include_router(dashboard_router)
 
 
 @app.get("/")

@@ -1,0 +1,42 @@
+from sqlalchemy.orm import Session
+
+from app.models.user import User
+from app.models.favorite import Favorite
+from app.models.search_history import SearchHistory
+
+
+def get_dashboard_stats(
+    db: Session,
+    current_user
+):
+
+    user = db.query(User).filter(
+        User.email == current_user["sub"]
+    ).first()
+
+    if not user:
+
+        return None
+
+    total_favorites = db.query(Favorite).filter(
+        Favorite.user_id == user.id
+    ).count()
+
+    total_searches = db.query(SearchHistory).filter(
+        SearchHistory.user_id == user.id
+    ).count()
+
+    recent_searches = db.query(SearchHistory).filter(
+        SearchHistory.user_id == user.id
+    ).order_by(
+        SearchHistory.searched_at.desc()
+    ).limit(3).all()
+
+    return {
+        "total_favorites": total_favorites,
+        "total_searches": total_searches,
+        "recent_searches": [
+            search.keyword
+            for search in recent_searches
+        ]
+    }
