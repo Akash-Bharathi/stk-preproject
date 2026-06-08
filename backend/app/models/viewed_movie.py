@@ -1,12 +1,21 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    DateTime,
+    ForeignKey
+)
+
 from sqlalchemy.orm import relationship
+
+from datetime import datetime
 
 from app.database.connection import Base
 
 
-class Favorite(Base):
+class ViewedMovie(Base):
 
-    __tablename__ = "favorites"
+    __tablename__ = "viewed_movies"
 
     id = Column(
         Integer,
@@ -24,14 +33,17 @@ class Favorite(Base):
         nullable=False
     )
 
-    poster = Column(
-        String,
-        nullable=False
-    )
+
     genre = Column(
         String,
         nullable=True
     )
+
+    viewed_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
     user_id = Column(
         Integer,
         ForeignKey("users.id")
@@ -39,5 +51,5 @@ class Favorite(Base):
 
     user = relationship(
         "User",
-        back_populates="favorites"
+        back_populates="viewed_movies"
     )

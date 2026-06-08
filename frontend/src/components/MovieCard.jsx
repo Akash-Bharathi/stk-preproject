@@ -5,58 +5,65 @@ function MovieCard({
   favorites
 }) {
   const navigate = useNavigate();
-  const isAdded =
-    favorites.some(
-      (item) =>
-        item.movie_id ===
-        movie.imdbID
-    );
+  const movieId = movie.imdbID || movie.movie_id;
+  const title = movie.Title || movie.title || "Untitled";
+  const year = movie.Year || movie.year || "";
+  const poster = movie.Poster || movie.poster || "https://via.placeholder.com/300x450";
+  const isAdded = movieId && favorites.some(
+    (item) =>
+      item.movie_id === movieId ||
+      item.imdbID === movieId
+  );
+
+  const canFavorite = Boolean(movieId);
+
+  const handleNavigate = () => {
+    if (movieId) {
+      navigate(`/movie/${movieId}`);
+    }
+  };
 
   return (
-
     <div className="movie-card">
-
       <button
         className="favorite-heart"
-        onClick={() => toggleFavorite(movie)}
+        onClick={() => canFavorite && toggleFavorite(movie)}
+        disabled={!canFavorite}
+        style={{ cursor: canFavorite ? "pointer" : "not-allowed" }}
       >
         {isAdded ? "❤️" : "♡"}
       </button>
-      {/* MOVIE POSTER */}
       <img
-        src={
-          movie.Poster !== "N/A"
-            ? movie.Poster
-            : "https://via.placeholder.com/300x450"
-        }
-        alt={movie.Title}
-        onClick={() => navigate(`/movie/${movie.imdbID}`)}
-        style={{ cursor: "pointer" }}
+        src={poster !== "N/A" ? poster : "https://via.placeholder.com/300x450"}
+        alt={title}
+        onClick={handleNavigate}
+        style={{ cursor: movieId ? "pointer" : "default" }}
       />
 
       <div className="info">
         <h3
-          onClick={() => navigate(`/movie/${movie.imdbID}`)}
-          style={{ cursor: "pointer" }}
+          onClick={handleNavigate}
+          style={{ cursor: movieId ? "pointer" : "default" }}
         >
-          {movie.Title}
+          {title}
         </h3>
-        <p>{movie.Year}</p>
+
+        {year && <p>{year}</p>}
+
+        {movie.reason && (
+          <small style={{ color: "#aaa", display: "block", marginBottom: "0.5rem" }}>
+            {movie.reason}
+          </small>
+        )}
+
         <button
           className="primary-btn"
-          onClick={() => navigate(`/movie/${movie.imdbID}`)}
+          onClick={handleNavigate}
+          disabled={!movieId}
         >
           View Details
         </button>
-        {/* Add to Wishlist Button */}
-        {/* <button
-          className="favorite-heart"
-          onClick={() => addToWishlist(movie)}
-        >
-          {isAdded ? "❤️" : "🤍"}
-        </button> */}
       </div>
-
     </div>
   );
 }

@@ -52,8 +52,30 @@ def search(
     return search_movies(title)
 
 
-# MOVIE DETAILS
 @router.get("/movies/{imdb_id}")
-def movie_details(imdb_id: str):
+def movie_details(
+    imdb_id: str,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
 
-    return get_movie(imdb_id)
+    movie = get_movie(imdb_id)
+
+    from app.models.user import User
+    from app.database.crud import save_viewed_movie
+
+    user = db.query(User).filter(
+        User.email == current_user["sub"]
+    ).first()
+
+    if user and movie:
+
+        save_viewed_movie(
+        db,
+        imdb_id,
+        movie.get("Title", "Unknown"),
+        movie.get("Genre", ""),
+        user.id
+    )
+
+    return movie

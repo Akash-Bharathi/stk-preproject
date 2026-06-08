@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database.connection import SessionLocal
-
+from app.services.omdb_service import get_movie
 from app.schemas.favorite_schema import (
     FavoriteCreate,
     FavoriteResponse
@@ -26,7 +26,7 @@ router = APIRouter()
 @router.post("/favorites")
 def add_favorite(
     favorite: FavoriteCreate,
-    current_user = Depends(get_current_user)
+    current_user=Depends(get_current_user)
 ):
     db: Session = SessionLocal()
     try:
@@ -47,11 +47,22 @@ def add_favorite(
                 detail="Movie already in favorites"
             )
 
+        movie_details = get_movie(
+            favorite.movie_id
+        )
+
+
+        genre = movie_details.get(
+            "Genre",
+            "Unknown"
+        )
+
         create_favorite(
             db,
             favorite.movie_id,
             favorite.title,
             favorite.poster,
+            genre,
             user.id
         )
 
@@ -69,7 +80,7 @@ def add_favorite(
     response_model=list[FavoriteResponse]
 )
 def get_favorites(
-    current_user = Depends(get_current_user)
+    current_user=Depends(get_current_user)
 ):
     db: Session = SessionLocal()
     try:
@@ -92,7 +103,7 @@ def get_favorites(
 @router.delete("/favorites/{movie_id}")
 def delete_favorite(
     movie_id: str,
-    current_user = Depends(get_current_user)
+    current_user=Depends(get_current_user)
 ):
     db: Session = SessionLocal()
     try:

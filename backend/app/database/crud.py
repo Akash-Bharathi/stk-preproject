@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 from app.models.favorite import Favorite
 
+from app.models.viewed_movie import ViewedMovie
 
-# ---------------- USERS ----------------
 
 def get_user_by_email(
     db: Session,
@@ -15,8 +15,6 @@ def get_user_by_email(
         User.email == email
     ).first()
 
-
-# ---------------- FAVORITES ----------------
 
 def get_user_favorites(
     db: Session,
@@ -45,6 +43,7 @@ def create_favorite(
     movie_id: str,
     title: str,
     poster: str,
+    genre: str,
     user_id: int
 ):
 
@@ -52,6 +51,7 @@ def create_favorite(
         movie_id=movie_id,
         title=title,
         poster=poster,
+        genre=genre,
         user_id=user_id
     )
 
@@ -73,6 +73,7 @@ def remove_favorite(
 
     db.commit()
 
+
 def create_user(
     db: Session,
     email: str,
@@ -91,3 +92,37 @@ def create_user(
     db.refresh(new_user)
 
     return new_user
+
+
+def save_viewed_movie(
+    db: Session,
+    movie_id: str,
+    title: str,
+    genre: str,
+    user_id: int
+):
+
+    viewed = ViewedMovie(
+        movie_id=movie_id,
+        title=title,
+        genre=genre,
+        user_id=user_id
+    )
+
+    db.add(viewed)
+
+    db.commit()
+
+    db.refresh(viewed)
+
+    return viewed
+
+
+def get_user_viewed_movies(
+    db: Session,
+    user_id: int
+):
+
+    return db.query(ViewedMovie).filter(
+        ViewedMovie.user_id == user_id
+    ).all()

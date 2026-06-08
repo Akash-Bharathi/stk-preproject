@@ -1,18 +1,10 @@
-import {
-  useEffect,
-  useState
-} from "react";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate
-} from "react-router-dom";
+import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { addFavorite, getFavorites, deleteFavorite, getRecommendations } from "./services/ombdapi";
 import MovieCard from "./components/MovieCard";
 import MovieSkeleton from "./components/MovieSkeleton";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import { addFavorite, getFavorites, deleteFavorite } from "./services/ombdapi";
 import Favorites from "./pages/Favorites";
 import MovieDetails from "./pages/MovieDetails";
 import NavBar from "./components/NavBar";
@@ -29,7 +21,7 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [wishlist, setWishlist] = useState([]);
   const [favorites, setFavorites] = useState([]);
-
+  const [recommendations, setRecommendations] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
   const [loading, setLoading] =
     useState(false);
@@ -101,9 +93,17 @@ function App() {
   // Homepage random movies
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token && token !== "null" && token !== "undefined") {
+    if (
+      token &&
+      token !== "null" &&
+      token !== "undefined"
+    ) {
+
       login(token);
+
       loadFavorites();
+
+      loadRecommendations();
     }
 
 
@@ -142,6 +142,26 @@ function App() {
       setError(error?.message || "Failed to load favorites");
     }
   };
+  const loadRecommendations =
+    async () => {
+
+      try {
+
+        const data =
+          await getRecommendations();
+
+        setRecommendations(
+          data.recommended_movies || []
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Failed to load recommendations:",
+          error
+        );
+      }
+    };
 
   const removeFavorite = async (movie) => {
     const movieId = movie.movie_id ?? movie.imdbID ?? movie.movie_id;
@@ -225,10 +245,11 @@ function App() {
             ];
 
           fetchMovies(random);
-
+          loadRecommendations();
         } else {
 
           fetchMovies(searchTerm);
+          loadRecommendations();
         }
 
       }, 500);
@@ -261,6 +282,7 @@ function App() {
       ]);
 
       await loadFavorites();
+      await loadRecommendations();
 
     } catch (error) {
 
@@ -334,7 +356,55 @@ function App() {
 
                   <button onClick={handleSearch}>Search</button>
                 </div>
+                {/* RECOMMENDED FOR YOU */}
 
+                {recommendations.length > 0 ? (
+
+                  <div
+                    style={{
+                      padding: "1rem 2rem"
+                    }}
+                  >
+
+                    <h2
+                      style={{
+                        color: "white",
+                        marginBottom: "1rem"
+                      }}
+                    >
+                      Recommended For You
+                    </h2>
+
+                    <div className="movie-container">
+
+                      {recommendations.map((movie, index) => (
+                        <MovieCard
+                          key={movie.imdbID || movie.movie_id || index}
+                          movie={movie}
+                          toggleFavorite={toggleFavorite}
+                          favorites={favorites}
+                        />
+                      ))}
+
+                    </div>
+
+                  </div>
+
+                ) : (
+
+                  <div
+                    style={{
+                      textAlign: "center",
+                      color: "white",
+                      marginTop: "1rem"
+                    }}
+                  >
+
+                    Start searching and adding favorites to get personalized recommendations.
+
+                  </div>
+
+                )}
 
                 {loading && (
                   <h2
@@ -357,6 +427,7 @@ function App() {
                     {error}
                   </h2>
                 )}
+
 
                 <div className="movie-container">
 
@@ -425,7 +496,7 @@ function App() {
                   favoriteCount={favorites.length}
                 />
 
-                <MovieDetails />
+                <MovieDetails onView={loadRecommendations} />
               </div>
             </ProtectedRoute>
           }

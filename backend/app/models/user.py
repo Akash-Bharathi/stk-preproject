@@ -42,3 +42,15 @@ class User(Base):
         back_populates="user",
         cascade="all, delete"
     )
+
+    viewed_movies = relationship(
+        "ViewedMovie",
+        back_populates="user",
+        cascade="all, delete"
+    )
+
+    preferences = relationship(
+        "UserPreference",
+        back_populates="user",
+        cascade="all, delete"
+    )

@@ -11,9 +11,30 @@ def save_search_history(
     current_user
 ):
 
+    # Ignore tiny searches
+    if len(keyword.strip()) < 3:
+        return None
+
     user = db.query(User).filter(
         User.email == current_user["sub"]
     ).first()
+
+    if not user:
+        return None
+
+    # Get latest search
+    last_search = db.query(SearchHistory).filter(
+        SearchHistory.user_id == user.id
+    ).order_by(
+        SearchHistory.searched_at.desc()
+    ).first()
+
+    # Prevent duplicate consecutive searches
+    if (
+        last_search and
+        last_search.keyword.lower() == keyword.lower()
+    ):
+        return last_search
 
     history = SearchHistory(
         keyword=keyword,
@@ -23,8 +44,9 @@ def save_search_history(
     db.add(history)
     db.commit()
 
-    return history
+    db.refresh(history)
 
+    return history
 
 # GET USER HISTORY
 def get_user_history(

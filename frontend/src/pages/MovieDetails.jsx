@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-
 import { getMovieDetails } from "../services/ombdapi";
 
-function MovieDetails() {
+function MovieDetails({ onView }) {
     const { imdbID } = useParams();
 
     const [movie, setMovie] = useState(null);
@@ -14,10 +13,11 @@ function MovieDetails() {
         const fetchMovie = async () => {
             try {
                 setLoading(true);
-
                 const data = await getMovieDetails(imdbID);
-
                 setMovie(data);
+                if (onView) {
+                    onView();
+                }
             } catch (err) {
                 setError("Failed to load movie details");
             } finally {
@@ -26,23 +26,18 @@ function MovieDetails() {
         };
 
         fetchMovie();
-    }, [imdbID]);
+    }, [imdbID, onView]);
 
     if (loading) {
         return (
             <div className="movie-details-loading">
-                <div className="skeleton-loader">
-                    Loading movie details...
-                </div>      </div>
+                <div>Loading movie details...</div>
+            </div>
         );
     }
 
     if (error) {
-        return (
-            <div className="movie-details-error">
-                {error}
-            </div>
-        );
+        return <div className="movie-details-error">{error}</div>;
     }
 
     if (!movie) {
@@ -51,42 +46,42 @@ function MovieDetails() {
 
     return (
         <div className="movie-details-container">
-            <div className="movie-details-card">
-
+            {/* Left 30%: The Poster */}
+            <div className="movie-poster-section">
                 <img
                     src={
                         movie.Poster !== "N/A"
                             ? movie.Poster
-                            : "https://via.placeholder.com/300x450"
+                            : "https://via.placeholder.com/600x900"
                     }
                     alt={movie.Title}
-                    className="movie-details-poster"
+                    className="full-poster"
                 />
+                {/* This div creates the soft gaze/fade effect */}
+                <div className="soft-fade"></div>
+            </div>
 
-                <div className="movie-details-info">
+            {/* Right 70%: The Information */}
+            <div className="movie-info-section">
+                <h1 className="movie-title">{movie.Title}</h1>
 
-                    <h1>{movie.Title}</h1>
+                <p className="detail-text">
+                    <strong>Year:</strong> {movie.Year}
+                </p>
 
-                    <p>
-                        <strong>Year:</strong> {movie.Year}
-                    </p>
+                <p className="detail-text">
+                    <strong>Genre:</strong> {movie.Genre}
+                </p>
 
-                    <p>
-                        <strong>Genre:</strong> {movie.Genre}
-                    </p>
+                <p className="detail-text">
+                    <strong>IMDb Rating:</strong> {movie.imdbRating}
+                </p>
 
-                    <p>
-                        <strong>IMDb Rating:</strong> {movie.imdbRating}
-                    </p>
+                <p className="detail-text" style={{ marginTop: "20px" }}>
+                    <strong>Plot:</strong>
+                </p>
 
-                    <p>
-                        <strong>Plot:</strong>
-                    </p>
-
-                    <p>{movie.Plot}</p>
-
-                </div>
-
+                <p className="detail-text plot-text">{movie.Plot}</p>
             </div>
         </div>
     );

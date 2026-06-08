@@ -121,31 +121,60 @@ export const searchMovies = async (title) => {
 
 
 // ---------------- MOVIE DETAILS ----------------
-
 export const getMovieDetails =
   async (imdbID) => {
-    try {
-      const response = await fetch(
-        `${BASE_URL}/movies/${imdbID}`
-      );
 
-      const text = await response.text();
+    const token =
+      localStorage.getItem("token");
+
+    try {
+
+      const response =
+        await fetch(
+          `${BASE_URL}/movies/${imdbID}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+      if (
+        response.status === 401 ||
+        response.status === 403
+      ) {
+
+        throw new Error(
+          "Unauthorized"
+        );
+      }
+
+      const text =
+        await response.text();
+
       try {
-        return text ? JSON.parse(text) : null;
+
+        return text
+          ? JSON.parse(text)
+          : null;
+
       } catch (e) {
+
         return text;
       }
+
     } catch (e) {
-      throw new Error(`Network error: Unable to reach ${BASE_URL}`);
+
+      throw new Error(
+        `Network error: Unable to reach ${BASE_URL}`
+      );
     }
   };
-
-
 // ---------------- ADD FAVORITE ----------------
 
 export const addFavorite =
   async (movie) => {
-
+  console.log(movie);
     const response = await fetch(
       `${BASE_URL}/favorites`,
       {
@@ -186,7 +215,6 @@ export const addFavorite =
         getErrorMessage(data, "Failed to add favorite")
       );
     }
-
     return data;
   };
 
@@ -281,4 +309,34 @@ export const deleteFavorite =
     }
 
     return data;
+  };
+
+export const getRecommendations =
+  async () => {
+
+    const token =
+      localStorage.getItem("token");
+
+    const response =
+      await fetch(
+        `${BASE_URL}/recommendations`,
+        {
+          headers: {
+            Authorization:
+              `Bearer ${token}`,
+          },
+        }
+      );
+
+    if (
+      response.status === 401 ||
+      response.status === 403
+    ) {
+
+      throw new Error(
+        "Unauthorized"
+      );
+    }
+
+    return response.json();
   };

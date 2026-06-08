@@ -4,9 +4,9 @@ from sqlalchemy.orm import relationship
 from app.database.connection import Base
 
 
-class Favorite(Base):
+class UserPreference(Base):
 
-    __tablename__ = "favorites"
+    __tablename__ = "user_preferences"
 
     id = Column(
         Integer,
@@ -14,24 +14,17 @@ class Favorite(Base):
         index=True
     )
 
-    movie_id = Column(
-        String,
-        nullable=False
-    )
-
-    title = Column(
-        String,
-        nullable=False
-    )
-
-    poster = Column(
-        String,
-        nullable=False
-    )
     genre = Column(
         String,
-        nullable=True
+        nullable=False
     )
+
+    score = Column(
+        Integer,
+        nullable=False,
+        default=1
+    )
+
     user_id = Column(
         Integer,
         ForeignKey("users.id")
@@ -39,5 +32,5 @@ class Favorite(Base):
 
     user = relationship(
         "User",
-        back_populates="favorites"
+        back_populates="preferences"
     )

@@ -4,14 +4,16 @@ from app.routes import auth, movies, favorites
 from fastapi.middleware.cors import CORSMiddleware
 from app.models.user import User
 from app.models.favorite import Favorite
+from app.models.user_preference import UserPreference
 from app.utils.hashing import hash_password
 from sqlalchemy.orm import Session
 from app.models.review import Review
 from app.models.search_history import SearchHistory
+from app.models.viewed_movie import ViewedMovie
+from app.routes.recommendations import router as recommendation_router
 from app.routes.reviews import router as review_router
 from app.routes.history import router as history_router
 from app.routes.dashboard import router as dashboard_router
-
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -37,6 +39,7 @@ app.include_router(movies.router)
 app.include_router(favorites.router)
 app.include_router(review_router)
 app.include_router(history_router)
+app.include_router(recommendation_router)
 app.include_router(dashboard_router)
 
 
