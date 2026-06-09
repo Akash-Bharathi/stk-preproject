@@ -89,7 +89,7 @@ function App() {
       setLoading(false);
     }
   };
-
+  
   // Homepage random movies
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -216,6 +216,11 @@ function App() {
     setWishlist([]);
   };
 
+  const handleHome = () => {
+    setSearchTerm("");
+    loadRecommendations();
+  };
+
   // Search movies
   const handleSearch = () => {
     if (searchTerm.trim() === "") {
@@ -249,7 +254,7 @@ function App() {
         } else {
 
           fetchMovies(searchTerm);
-          loadRecommendations();
+          setRecommendations([]);
         }
 
       }, 500);
@@ -340,6 +345,7 @@ function App() {
                   darkMode={darkMode}
                   setDarkMode={setDarkMode}
                   logout={handleLogout}
+                  onHome={handleHome}
                   userName={localStorage
                     .getItem("email")
                     ?.split("@")[0]}
@@ -358,11 +364,11 @@ function App() {
                 </div>
                 {/* RECOMMENDED FOR YOU */}
 
-                {recommendations.length > 0 ? (
+                {searchTerm.trim() === "" && recommendations.length > 0 ? (
 
                   <div
                     style={{
-                      padding: "1rem 2rem"
+                      padding: "1rem 1rem"
                     }}
                   >
 
@@ -390,7 +396,7 @@ function App() {
 
                   </div>
 
-                ) : (
+                ) : searchTerm.trim() === "" ? (
 
                   <div
                     style={{
@@ -404,7 +410,7 @@ function App() {
 
                   </div>
 
-                )}
+                ) : null}
 
                 {loading && (
                   <h2
@@ -427,7 +433,16 @@ function App() {
                     {error}
                   </h2>
                 )}
-
+                {searchTerm.trim() === "" && (
+                  <h2
+                        style={{
+                          color: "white",
+                          marginBottom: "1rem"
+                        }}
+                      >
+                        Home
+                      </h2>
+                )}
 
                 <div className="movie-container">
 
@@ -471,6 +486,7 @@ function App() {
                   darkMode={darkMode}
                   setDarkMode={setDarkMode}
                   logout={handleLogout}
+                  onHome={handleHome}
                   userName={localStorage
                     .getItem("email")
                     ?.split("@")[0]}
@@ -490,6 +506,7 @@ function App() {
                   darkMode={darkMode}
                   setDarkMode={setDarkMode}
                   logout={handleLogout}
+                  onHome={handleHome}
                   userName={localStorage
                     .getItem("email")
                     ?.split("@")[0]}

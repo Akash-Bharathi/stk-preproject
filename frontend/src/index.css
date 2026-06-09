@@ -274,14 +274,14 @@
 .movie-container {
     display: grid;
     gap: 1.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     align-items: stretch;
     justify-items: center;
 }
 
 .movie-card {
     width: 100%;
-    max-width: 260px;
+    max-width: 260px; 
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 22px;
@@ -297,6 +297,7 @@
 }
 .movie-card img {
   transition: transform 0.3s ease;
+  aspect-ratio: 2 / 3; 
 }
 .movie-card:hover img {
   transform: scale(1.03);
@@ -774,5 +775,31 @@ a {
     .detail-text {
         font-size: 1.1rem;
     }
+}
+
+.nav-home-btn {
+    text-decoration: none;
+    border: none;
+    background: #8a631c;
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: inherit;
+    font-family: inherit;
+}
+
+.nav-home-btn-mobile {
+    text-decoration: none;
+    border: none;
+    background: #8a631c;
+    color: white;
+    padding: 0.8rem;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    font-size: inherit;
+    font-family: inherit;
+    width: 100%;
 }
 

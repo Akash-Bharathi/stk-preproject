@@ -1,14 +1,17 @@
 import { useState } from "react";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Navbar({
   darkMode,
   setDarkMode,
   logout,
   userName,
-  favoriteCount
+  favoriteCount,
+  onHome
 }) {
+
+  const navigate = useNavigate();
 
   const [menuOpen, setMenuOpen] =
     useState(false);
@@ -25,9 +28,15 @@ function Navbar({
       {/* DESKTOP MENU */}
       <div className="nav-links desktop-menu">
 
-        <Link to="/">
+        <button
+          onClick={() => {
+            onHome();
+            navigate("/");
+          }}
+          className="nav-home-btn"
+        >
           Home
-        </Link>
+        </button>
 
         <Link to="/favorites">
           Favorites ({favoriteCount})
@@ -85,14 +94,16 @@ function Navbar({
 
         <div className="mobile-menu">
 
-          <Link
-            to="/"
-            onClick={() =>
-              setMenuOpen(false)
-            }
+          <button
+            onClick={() => {
+              onHome();
+              navigate("/");
+              setMenuOpen(false);
+            }}
+            className="nav-home-btn-mobile"
           >
             Home
-          </Link>
+          </button>
 
           <Link
             to="/favorites"
